@@ -1,0 +1,10 @@
+fastapi~=0.112.2
+langchain-core~=0.3.43
+numpy~=2.2.3
+openai~=1.60.1
+opencv-python~=4.11.0.86
+pydantic~=2.10.3
+pyyaml~=6.0.2
+requests~=2.32.3
+sqlalchemy~=2.0.38
+uvicorn~=0.32.1
