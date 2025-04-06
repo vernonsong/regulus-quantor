@@ -1,0 +1,7 @@
+# 欲买桂花同载酒，
+# 终不似、少年游。
+# Copyright (c) VernonSong. All rights reserved.
+# ==============================================================================
+from .img_recognize_model import ImgRecognizeModel
+
+__all__ = ['ImgRecognizeModel']
