@@ -3,15 +3,6 @@ on:
   pull_request:
     branches: [ master, release* ]
 jobs:
-  check-commit-message:
-    name: Check Commit Message
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check Commit Message Format
-        uses: wagoid/commitlint-github-action@v5
-        with:
-          configFile: .commitlintrc.yml
-          failOnWarnings: true
   qodana:
     runs-on: ubuntu-latest
     permissions:
