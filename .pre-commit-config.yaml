@@ -9,13 +9,13 @@ repos:
     rev: v0.32.0
     hooks:
       - id: yapf
-        args: [--style=.style.yapf]
 
   # 2. 最后运行代码检查工具
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
+        args: ["--max-line-length=80"]
 
   # 其他钩子保持原顺序
   - repo: https://github.com/codespell-project/codespell
