@@ -25,7 +25,6 @@ def extract_json_from_string(input_string: str) -> dict:
 
     # 提取匹配到的内容
     json_str = match.group(1).strip()
-
     try:
         # 将JSON字符串解析为字典
         result_dict = json.loads(json_str)
@@ -44,9 +43,9 @@ class ImgRecognizeService:
     def recognize(self, img_path) -> RecognizeResult:
         result_json = self._img_recognize_model(img_path, self._prompt)
         try:
-            result_dict = self.extract_json_from_string(result_json)
+            result_dict = extract_json_from_string(result_json)
             return RecognizeResult(type=ImgType(result_dict['type']),
-                                   content=result_dict['content'])
+                                   content=str(result_dict['content']))
         except ValidationError as e:
             print(f'验证错误: {e}')
             raise

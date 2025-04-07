@@ -9,4 +9,4 @@
 }
 ```
 
-其中如果是股市分析，type为analyze，如果是持仓截图，type为position
+其中如果是股市分析，type为analyze，如果是持仓截图，type为position，注意json格式，不要在json中输出换行符，会导致无法解析json
