@@ -37,9 +37,9 @@ class DefaultMarketInfoRepository(MarketInfoRepository):
 
         # 使用明确的参数命名
         params = {
-                'trade_date': trade_date,
-                'send_period': SendPeriod.MORNING.value,
-                'previous_date': trade_date - timedelta(days=1)
+            'trade_date': trade_date,
+            'send_period': SendPeriod.MORNING.value,
+            'previous_date': trade_date - timedelta(days=1)
         }
 
         with self.db.begin():
@@ -47,26 +47,28 @@ class DefaultMarketInfoRepository(MarketInfoRepository):
             connection = self.db.connection()
             # 执行第一个查询并立即获取结果
             message_records = connection.execute(
-                    message_query, {
-                            'trade_date': params['trade_date'],
-                            'send_period': params['send_period']
-                    }).fetchall()
+                message_query, {
+                    'trade_date': params['trade_date'],
+                    'send_period': params['send_period']
+                }).fetchall()
 
             # 执行第二个查询并立即获取结果
             position_records = connection.execute(
-                    position_query, {
-                            'previous_date': params['previous_date']
-                    }).fetchall()
+                position_query, {
+                    'previous_date': params['previous_date']
+                }).fetchall()
 
         # 构造结果对象
-        return PreMarketInfo(
-                analyze_content=[
-                        MessageDaily(content=row.content, source=row.source)
-                        for row in message_records
-                ], position=position_records[0].position
-                if position_records else None, trade_date=trade_date)
+        return PreMarketInfo(analyze_content=[
+            MessageDaily(content=row.content, source=row.source)
+            for row in message_records
+        ],
+                             position=str(position_records[0].position)
+                             if position_records else None,
+                             trade_date=trade_date)
 
-    def get_stock_price_30_day(self, trade_date: date) -> List[StockPriceDaily]:
+    def get_stock_price_30_day(self,
+                               trade_date: date) -> List[StockPriceDaily]:
         start_date = (trade_date - timedelta(days=30))
         sql = text("""
         SELECT *
@@ -74,13 +76,16 @@ class DefaultMarketInfoRepository(MarketInfoRepository):
         WHERE trade_date >= :start_date
     """)
         result = self.db.execute(sql, {
-                'start_date': start_date,
+            'start_date': start_date,
         })
 
         return [
-                StockPriceDaily(stock_code=row.stock_code,
-                                trade_date=row.trade_date, open=row.open,
-                                close=row.close, high=row.high, low=row.low,
-                                volume=row.volume, money=row.money)
-                for row in result
+            StockPriceDaily(stock_code=row.stock_code,
+                            trade_date=row.trade_date,
+                            open=row.open,
+                            close=row.close,
+                            high=row.high,
+                            low=row.low,
+                            volume=row.volume,
+                            money=row.money) for row in result
         ]
