@@ -28,12 +28,19 @@ class DefaultMarketInfoRepository(MarketInfoRepository):
               AND send_period = :send_period
         """)
 
-        # 查询前一日仓位（修正拼写错误position）
+        # 查询前一日仓位
         position_query = text("""
             SELECT position
             FROM position_daily
             WHERE trade_date = :previous_date
         """)
+
+        # 查询今日策略打分
+        strategy_score_query = text("""
+                   SELECT score
+                   FROM strategy_daily
+                   WHERE trade_date = :trade_date
+               """)
 
         # 使用明确的参数命名
         params = {
@@ -58,14 +65,22 @@ class DefaultMarketInfoRepository(MarketInfoRepository):
                     'previous_date': params['previous_date']
                 }).fetchall()
 
+            strategy_score_records = connection.execute(
+                strategy_score_query, {
+                    'trade_date': params['trade_date']
+                }).fetchall()
+
         # 构造结果对象
-        return PreMarketInfo(analyze_content=[
-            MessageDaily(content=row.content, source=row.source)
-            for row in message_records
-        ],
-                             position=str(position_records[0].position)
-                             if position_records else None,
-                             trade_date=trade_date)
+        return PreMarketInfo(
+            analyze_content=[
+                MessageDaily(content=row.content, source=row.source)
+                for row in message_records
+            ],
+            position=str(position_records[0].position)
+            if position_records else None,
+            strategy_score=str(strategy_score_records[0].score)
+            if strategy_score_records else None,
+            trade_date=trade_date)
 
     def get_stock_price_30_day(self,
                                trade_date: date) -> List[StockPriceDaily]:

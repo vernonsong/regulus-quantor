@@ -16,4 +16,5 @@ class MessageDaily(BaseModel):
 class PreMarketInfo(BaseModel):
     analyze_content: List[MessageDaily]
     position: Optional[str] = None
+    strategy_score: Optional[str] = None
     trade_date: date
