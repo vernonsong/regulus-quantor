@@ -24,7 +24,8 @@ class PreMarketStrategy:
         """
         self._market_info_reposition = market_info_reposition
         self.llm = DeepSeek(api_key=model_config.api_key,
-                            api_base=model_config.base_url, model='deepseek-r1',
+                            api_base=model_config.base_url,
+                            model='deepseek-r1',
                             temperature=0.1)
 
     def generate_strategy(self, trade_date: date) -> str:
@@ -34,22 +35,24 @@ class PreMarketStrategy:
         :return: 策略内容
         """
         pre_market_info = self._market_info_reposition.get_pre_market_info(
-                trade_date)
+            trade_date)
         stock_price_30_day = (
-                self._market_info_reposition.get_stock_price_30_day(trade_date))
+            self._market_info_reposition.get_stock_price_30_day(trade_date))
         input_prompt = load_prompt('prefix.md') + load_prompt(
-                'pre_market_input.md')
+            'pre_market_input.md')
 
         response = self.llm.invoke(
-                input_prompt.format(
-                        etf_pool=load_prompt('etf_pool.md'),
-                        message_from_security_manager='\n'.join([
-                                analyze_content.content for analyze_content in
-                                pre_market_info.analyze_content
-                        ]), etf_score='', after_market_strategy='',
-                        position=pre_market_info.position
-                        if pre_market_info.position is not None else '空仓',
-                        trade_date=trade_date,
-                        etf_price=str(stock_price_30_day)))
+            input_prompt.format(
+                etf_pool=load_prompt('etf_pool.md'),
+                message_from_security_manager='\n'.join([
+                    analyze_content.content
+                    for analyze_content in pre_market_info.analyze_content
+                ]),
+                etf_score=pre_market_info.strategy_score,
+                after_market_strategy='',
+                position=pre_market_info.position
+                if pre_market_info.position is not None else '空仓',
+                trade_date=trade_date,
+                etf_price=str(stock_price_30_day)))
 
         return response.content
