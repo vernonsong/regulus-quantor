@@ -1,19 +1,18 @@
-# 欲买桂花同载酒，
-# 终不似、少年游。
-# Copyright (c) VernonSong. All rights reserved.
-# ==============================================================================
+"""Weather tools for MCP Streamable HTTP server using NWS API."""
+
 import uvicorn
-from fastapi import FastAPI
-from interfaces.rest import message, strategy
+from mcp.server.fastmcp import FastMCP
 
-app = FastAPI(root_path='/regulus')
-app.include_router(message.router)
-app.include_router(strategy.router)
+mcp = FastMCP(name='weather', json_response=True)
 
 
-@app.get('/')
-async def root():
-    return {'message': 'Hello World'}
+# Add an addition tool
+@mcp.tool()
+def get_weather(city: str) -> str:
+    """获取指定城市天气"""
+    return '有雨，12-19度'
+
 
 if __name__ == '__main__':
-    uvicorn.run('app:app')
+    # Start the server with Streamable HTTP transport
+    uvicorn.run(mcp.streamable_http_app, host='localhost', port=8000)
